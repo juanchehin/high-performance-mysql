@@ -50,3 +50,43 @@ awk '
       Queries=$2
    }
    ' "$@"
+
+# Ejecuto el archivo (previo debe llamarse 'analyze')
+ [chehin@chehin ~]$ ./analyze 5-sec-status-2011-03-20
+
+# =======================================================
+# =======================================================
+
+# *** Funcion 'benchmark' de MySQL ***
+# El siguiente script compara la velocidad de MD5() y SHA1()
+
+SET @input := 'hello world';
+SELECT BENCHMARK(1000000, MD5(@input));
+SELECT BENCHMARK(1000000, SHA1(@input));
+
+
+# =======================================================
+# Configuracion de dbt2
+# =======================================================
+
+# 1. Preparar datos
+
+# El  siguiente  comando  crea  datos  para  10  almacenes  en  el  directorio  especificado.
+# Los  almacenes  utilizan  un  total  de  unos  700  MB  de  espacio.  La  cantidad  de  espacio  requerido  cambiará 
+# en  proporción  a  la  cantidad  de  almacenes,  por  lo  que  puede  cambiar  el  parámetro  -w  para  crear  un 
+# conjunto  de  datos  con  el  tamaño  que  necesita
+
+src/datagen -w 10 -d /mnt/data/dbt2-w10
+
+# 2.  Cargue  datos  en  la  base  de  datos  MySQ
+
+# El  siguiente  comando  crea  una  base  de  datos  llamada  dbt2w10  y  la  carga  con  el
+#datos  que  generamos  en  el  paso  anterior
+
+scripts/mysql/mysql_load_db.sh -d dbt2w10 -f /mnt/data/dbt2-w10/
+-s /var/lib/mysql/mysql.sock
+
+# 3. Ejecute el benchmark
+
+run_mysql.sh -c 10 -w 10 -t 300 -n dbt2w10/
+-u root -o /var/lib/mysql/mysql.sock-e

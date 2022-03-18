@@ -1,0 +1,33 @@
+# =====================================================
+# Comando que obtiene los datos de las urls.txt
+# =====================================================
+
+$ http_load -parallel 1 -seconds 10 urls.txt
+
+# Resultado:  muestran  estadísticas  sobre  las  solicitudes
+
+94 fetches, 5 max parallel, 4.75565e+06 bytes, in 10.0005 seconds
+50592 mean bytes/connection
+9.39953 fetches/sec, 475541 bytes/sec
+msecs/connect: 65.1983 mean, 169.991 max, 38.189 min
+msecs/first-response: 245.014 mean, 993.059 max, 99.646 min
+HTTP response codes:
+  code 200 - 94
+
+# =====================================================
+# Comando de http_load que simula 5 usuarios simultaneos
+# =====================================================
+
+$ http_load -parallel 5 -seconds 10 urls.txt
+
+# =====================================================
+# Comando que emula la carga para una tasa prevista de solicitures (cinco por segundo)
+# =====================================================
+
+$ http_load -rate 5 -seconds 10 urls.txt
+
+# =====================================================
+# Comando  emulamos  aún  más  carga,  con  una  tasa  de  entrada  de  20  solicitudes  por  segundo
+# =====================================================
+
+$ http_load -rate 20 -seconds 10 urls.txt
