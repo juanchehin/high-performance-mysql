@@ -1,0 +1,31 @@
+# Activo la creacion de perfiles
+
+mysql> SET profiling = 1;
+
+# Muestra todos los perfiles de las consultas realizadas anteriormente
+
+SHOW PROFILES;
+
+# Muestra el perfil para la consulta '1'
+
+SHOW PROFILE FOR QUERY 1;
+
+# Seteo la consulta '1'
+
+SET @query_id = 1;
+
+# Listado detallado del perfil de la tarea o consulta '1'
+
+SELECT STATE, SUM(DURATION) AS Total_R,
+ROUND(
+	100 * SUM(DURATION) /
+              (SELECT SUM(DURATION)
+               FROM INFORMATION_SCHEMA.PROFILING
+               WHERE QUERY_ID = @query_id
+           ), 2) AS Pct_R,
+        COUNT(*) AS Calls,
+        SUM(DURATION) / COUNT(*) AS "R/Call"
+     FROM INFORMATION_SCHEMA.PROFILING
+     WHERE QUERY_ID = @query_id
+     GROUP BY STATE
+     ORDER BY Total_R DESC;
